@@ -5,8 +5,6 @@ from ..items import DdapItem
 
 
 
-
-
 class InspectionsSpider(scrapy.Spider):
     name = 'inspections'
     start_urls = ['http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DAFind.aspx']
@@ -15,7 +13,7 @@ class InspectionsSpider(scrapy.Spider):
 
         # Getting all counties with the exception of first, '-All'
         county_list = response.css('select#dropCounties option::attr(value)').extract()[1:]
-        # county_list = ["adams","mercer"]
+        # county_list = ["elk","adams"]
         self.log(f"Facilities from the following providers will be scraped: {county_list}")
 
         county_list = [county.upper() for county in county_list]
@@ -32,21 +30,29 @@ class InspectionsSpider(scrapy.Spider):
 
     def parse_provider_list(self,response):
         county = response.meta.get('county')
-        self.log(f'Getting facilities in {county}')
+        self.log(f'Getting facilities in {county}...')
 
-        rows = response.css('form#frmFacInfo > table')[1].css('tr')
-        rows_without_header = rows[1:]
+        fac_info_tables = response.css('form#frmFacInfo > table')
 
-        for count, row in enumerate(rows_without_header):
-            item = DdapItem()
-            facility_id = row.css('td:nth-child(2) a::attr(href)').re_first(r'facid=(.*)')
-            item['facility_name'] = row.css('td:nth-child(2) b::text').extract_first()
-            item['facility_id'] = facility_id
+        if fac_info_tables:
+            self.log(f'{county } County: Facilities found')
+            rows = fac_info_tables[1].css('tr')
+            rows_without_header = rows[1:]
 
-            url_survey_list = f"http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyList.aspx?facid={facility_id}"
+            for count, row in enumerate(rows_without_header):
+                item = DdapItem()
+                facility_id = row.css('td:nth-child(2) a::attr(href)').re_first(r'facid=(.*)')
+                item['facility_name'] = row.css('td:nth-child(2) b::text').extract_first()
+                item['facility_id'] = facility_id
+                item['facility_county'] = county
 
-            yield response.follow(url_survey_list, callback=self.parse_survey_list,
-                                  meta={'item': item.copy()})
+                url_survey_list = f"http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyList.aspx?facid={facility_id}"
+
+                yield response.follow(url_survey_list, callback=self.parse_survey_list,
+                                      meta={'item': item.copy()})
+        else:
+            self.log(f'{county } County: No facilities found!')
+
 
 
     def parse_survey_list(self,response):
