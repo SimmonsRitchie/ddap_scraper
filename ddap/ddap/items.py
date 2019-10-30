@@ -17,3 +17,4 @@ class DdapItem(scrapy.Item):
     initial_comments = scrapy.Field()
     regulation = scrapy.Field()
     observations = scrapy.Field()
+    plan_of_correction = scrapy.Field()

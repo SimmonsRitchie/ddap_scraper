@@ -72,8 +72,11 @@ class InspectionsSpider(scrapy.Spider):
 
             observations = rows_without_initial_comments[count+1]\
                 .css('tr > td:nth-child(1)::text').extract()
+            plan_of_correction = rows_without_initial_comments[count+1]\
+                .css('tr > td:nth-child(2)::text').extract()
 
             item['observations'] = " ".join(observations)
+            item['plan_of_correction'] = " ".join(plan_of_correction)
 
             yield item
 
