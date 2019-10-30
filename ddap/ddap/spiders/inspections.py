@@ -3,6 +3,10 @@ import scrapy
 from scrapy.http import FormRequest
 from ..items import DdapItem
 
+
+
+
+
 class InspectionsSpider(scrapy.Spider):
     name = 'inspections'
     start_urls = ['http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DAFind.aspx']
@@ -57,8 +61,9 @@ class InspectionsSpider(scrapy.Spider):
 
             url_survey = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid={" \
                          "}&exit_date={}&eventid={}".format(item['facility_id'],item['exit_date'],item['event_id'])
-            url_testing = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid=IHK46601&exit_date=02/14/2012&eventid=31H811"
-
+            # url_testing = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid=IHK46601&exit_date=02/14/2012&eventid=31H811"
+            #url_testing2 = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid
+            # =Z3PK6601&exit_date=09/27/2018&eventid=36NG11"
             yield response.follow(url_survey, callback=self.parse_survey,
                                   meta={'item': item.copy()})
 
@@ -72,12 +77,19 @@ class InspectionsSpider(scrapy.Spider):
         if rows_without_initial_comments:
             for count, row in enumerate(rows_without_initial_comments):
                 self.log(f'Row count: {count + 1}')
+
+                # We only want odd rows because they contain the regulation value
                 if (count + 1) % 2 == 0:
                     self.log('Row count is an even number - skip to next row')
                     continue
 
-                item['regulation'] = row.css('tr > td font::text').extract_first().strip()
+                # In rare cases, another row with 'initial comments' appears within rows_without_initial_comments
+                if row.css('td b::text').re_first('INITIAL COMMENTS'):
+                    self.log("STRANGE - 'INITIAL COMMENTS' detected in row - skip to next row")
+                    continue
 
+                regulation = row.css('tr > td font::text').extract_first()
+                item['regulation'] = self.clean_field(regulation, item['facility_id'])
                 observations = rows_without_initial_comments[count+1]\
                     .css('tr > td:nth-child(1)::text').extract()
                 plan_of_correction = rows_without_initial_comments[count+1]\
@@ -87,11 +99,20 @@ class InspectionsSpider(scrapy.Spider):
                 item['plan_of_correction'] = " ".join(plan_of_correction)
 
                 yield item
+
         else:
             field_names = ['regulation','observations','plan_of_correction']
             for field in field_names:
                 item[field] = None
 
             yield item
+
+
+    def clean_field(self, value, facility_id):
+        if value:
+            return value.strip()
+        else:
+            self.log(f"STRANGE - encountered 'None' when cleaning value for {facility_id}")
+            return value
 
 
