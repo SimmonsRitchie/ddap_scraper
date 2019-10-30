@@ -27,11 +27,12 @@ class InspectionsSpider(scrapy.Spider):
                 'dropCounties': county,
                 # 'dropCounties': '-All',
                 'btnSubmit2': 'Find'
-            }, callback=self.parse_provider_list)
+            }, callback=self.parse_provider_list, meta={'county': county})
 
 
     def parse_provider_list(self,response):
-        self.log('On facility list page')
+        county = response.meta.get('county')
+        self.log(f'Getting facilities in {county}')
 
         rows = response.css('form#frmFacInfo > table')[1].css('tr')
         rows_without_header = rows[1:]
