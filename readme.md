@@ -1,6 +1,6 @@
 ### Pa. DDAP inspection scraper
 
-Python script built with Scrapy to download inspections from Pa. Department of Drug and Alcohol Programs website.
+Python script built with Scrapy to scrape inspections from Pa. Department of Drug and Alcohol Programs website.
 
 #### Requirements
 
