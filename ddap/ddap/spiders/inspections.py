@@ -69,8 +69,7 @@ class InspectionsSpider(scrapy.Spider):
             url_survey = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid={" \
                          "}&exit_date={}&eventid={}".format(item['facility_id'],item['exit_date'],item['event_id'])
             # url_testing = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid=IHK46601&exit_date=02/14/2012&eventid=31H811"
-            #url_testing2 = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid
-            # =Z3PK6601&exit_date=09/27/2018&eventid=36NG11"
+            #url_testing2 = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid=Z3PK6601&exit_date=09/27/2018&eventid=36NG11"
             yield response.follow(url_survey, callback=self.parse_survey,
                                   meta={'item': item.copy()})
 
