@@ -13,7 +13,7 @@ class InspectionsSpider(scrapy.Spider):
 
         # Getting all counties with the exception of first, '-All'
         county_list = response.css('select#dropCounties option::attr(value)').extract()[1:]
-        self.log(f"Facilities from the following providers will be scraped: {county_list}")
+        self.log(f"Facilities from the following counties will be scraped: {county_list}")
 
         county_list = [county.upper() for county in county_list]
 
