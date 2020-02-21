@@ -27,10 +27,17 @@ dependencies. Run:
 
 #### Run
 
-From the terminal, make sure you're in the project directory. Run the following:
+This project uses Scrapy and takes advantage of its excellent CLI.
 
-```python run.py```
+In the terminal, navigate to the project's root directory and then into the ddap directory:
 
-Or:
+`cd ddap`
 
-```pipenv run python run.py```
+To begin the scrape and generate a CSV of scraped data, run:
+
+`scrapy crawl inspections -o scraped_data.csv`
+
+To generate a JSON or XML file, just swap the file extension. Eg.
+
+`scrapy crawl inspections -o scraped_data.json`
+
