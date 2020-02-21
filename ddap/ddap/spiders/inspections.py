@@ -13,7 +13,6 @@ class InspectionsSpider(scrapy.Spider):
 
         # Getting all counties with the exception of first, '-All'
         county_list = response.css('select#dropCounties option::attr(value)').extract()[1:]
-        # county_list = ["elk","adams"]
         self.log(f"Facilities from the following providers will be scraped: {county_list}")
 
         county_list = [county.upper() for county in county_list]
@@ -23,7 +22,6 @@ class InspectionsSpider(scrapy.Spider):
             yield FormRequest(url="http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DAFacilityInfo.aspx", formdata={
                 'radio': 'on',
                 'dropCounties': county,
-                # 'dropCounties': '-All',
                 'btnSubmit2': 'Find'
             }, callback=self.parse_provider_list, meta={'county': county})
 
@@ -68,8 +66,6 @@ class InspectionsSpider(scrapy.Spider):
 
             url_survey = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid={" \
                          "}&exit_date={}&eventid={}".format(item['facility_id'],item['exit_date'],item['event_id'])
-            # url_testing = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid=IHK46601&exit_date=02/14/2012&eventid=31H811"
-            #url_testing2 = "http://sais.health.pa.gov/commonpoc/Content/PublicWeb/DASurveyDetails.aspx?facid=Z3PK6601&exit_date=09/27/2018&eventid=36NG11"
             yield response.follow(url_survey, callback=self.parse_survey,
                                   meta={'item': item.copy()})
 
