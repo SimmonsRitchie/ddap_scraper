@@ -10,3 +10,6 @@ scrapy = "*"
 
 [requires]
 python_version = "3.6"
+
+[scripts]
+scrape = "scrapy crawl inspections -o scraped_data.csv"

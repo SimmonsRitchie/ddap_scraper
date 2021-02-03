@@ -29,9 +29,11 @@ dependencies. Run:
 
 This project uses Scrapy and takes advantage of its excellent CLI.
 
-In the terminal, navigate to the project's root directory and then into the ddap directory:
+In the terminal, navigate to the project's root directory and then into the ddap directory. 
 
 `cd ddap`
+
+NOTE: It's important that you are in this directory otherwise the subsequent commands will not work.
 
 To begin the scrape and generate a CSV of scraped data, run:
 
